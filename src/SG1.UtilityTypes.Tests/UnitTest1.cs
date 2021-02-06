@@ -20,7 +20,7 @@ namespace SG1.UtilityTypes.Tests
         }
 
         [Test]
-        public void Test1()
+        public void PartialAttributeWithDefaultsTest()
         {
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
@@ -35,8 +35,8 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class Model1Partial
     {
-        public string FirstName { get; set; }  = default!;
-        public string LastName { get; set; }  = default!;
+        public string FirstName { get; set; } = default!;
+        public string LastName { get; set; } = default!;
         public string? Email { get; set; }
         public Nullable<int> Age { get; set; }
     };
@@ -50,7 +50,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         }
 
         [Test]
-        public void Test2()
+        public void PartialAttributeWithOverrideTest()
         {
             string source = @"using SG1.UtilityTypes;
 
@@ -69,6 +69,95 @@ namespace SampleNamespace
         public Optional<string> LastName { get; set; }
         public Optional<string?> Email { get; set; }
         public Optional<int> Age { get; set; }
+    };
+}
+";
+            string output = GetGeneratedOutput(source);
+
+            Assert.NotNull(output);
+
+            Assert.AreEqual(expectedOutput, output);
+        }
+
+
+        [Test]
+        public void PickAttributeTest()
+        {
+            string source = @"
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+    [UtilityTypes.PickAttribute(typeof(Model1), new string[] { ""FirstName"" })]
+    public partial class Model1Partial { }
+}";
+
+            string expectedOutput = @"using System;
+
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+    public partial class Model1Partial
+    {
+        public string FirstName { get; set; } = default!;
+    };
+}
+";
+            string output = GetGeneratedOutput(source);
+
+            Assert.NotNull(output);
+
+            Assert.AreEqual(expectedOutput, output);
+        }
+
+
+        [Test]
+        public void ReadonlyAttributeTest()
+        {
+            string source = @"
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+    [UtilityTypes.ReadonlyAttribute(typeof(Model1))]
+    public partial class Model1Partial { }
+}";
+
+            string expectedOutput = @"using System;
+
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+    public partial class Model1Partial
+    {
+        public string FirstName { get; } = default!;
+        public string LastName { get; } = default!;
+        public string? Email { get; }
+        public int Age { get; } = default!;
+    };
+}
+";
+            string output = GetGeneratedOutput(source);
+
+            Assert.NotNull(output);
+
+            Assert.AreEqual(expectedOutput, output);
+        }
+
+
+        [Test]
+        public void OmitAttributeTest()
+        {
+            string source = @"
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+    [UtilityTypes.OmitAttribute(typeof(Model1), new string[] { ""FirstName"" })]
+    public partial class Model1Partial { }
+}";
+
+            string expectedOutput = @"using System;
+
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+    public partial class Model1Partial
+    {
+        public string LastName { get; set; } = default!;
+        public string? Email { get; set; }
+        public int Age { get; set; } = default!;
     };
 }
 ";

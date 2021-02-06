@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using SG1.UtilityTypes.Transformations;
 
 namespace SG1.UtilityTypes
 {
@@ -16,21 +17,12 @@ namespace SG1.UtilityTypes
         {
             InputType = inputType;
         }
-    }
 
-    internal interface ITransformation { }
-
-    internal sealed class PartialTransformation : ITransformation
-    {
-        public IPropertySymbol[] Fields { get; }
-        public string WrappingType { get; }
-        public bool WrapReferenceTypes { get; }
-
-        public PartialTransformation(INamedTypeSymbol sourceType, string wrappingType, bool wrapReferenceTypes)
+        public TransformInformation(ITypeSymbol inputType, IList<ITransformation> transformations) : this(inputType)
         {
-            Fields = sourceType.GetMembers().OfType<IPropertySymbol>().ToArray();
-            WrappingType = wrappingType;
-            WrapReferenceTypes = wrapReferenceTypes;
+            Transformations = transformations;
         }
     }
+
+
 }
