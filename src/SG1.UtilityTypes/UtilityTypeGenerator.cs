@@ -8,25 +8,19 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using SG1.UtilityTypes.Configuration;
+using SG1.UtilityTypes.Transformations;
 
 namespace SG1.UtilityTypes
 {
     [Generator]
     public class UtilityTypeGenerator : ISourceGenerator
     {
-        private const string partialAttributeText = @"using System;
-
-namespace SG1.UtilityTypes
-{
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-    public sealed class PartialAttribute : Attribute
-    {
-        public PartialAttribute(Type sourceType, string wrappingType = ""Nullable"", bool wrapReferenceTypes = false)
-        {
-        }
-    }
-}
-";
+        private ITransformationReader[] TransformationReaders = new ITransformationReader[] {
+            new PartialTransformationReader(),
+            new PickTransformationReader(),
+            new ReadonlyTransformationReader(),
+            new OmitTransformationReader(),
+        };
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -44,44 +38,45 @@ namespace SG1.UtilityTypes
             {
                 throw new InvalidOperationException("Options is not CSharpParseOptions");
             }
-            return compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(partialAttributeText, Encoding.UTF8), options));
+            return compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(text, Encoding.UTF8), options));
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            context.AddSource("PartialAttribute", SourceText.From(partialAttributeText, Encoding.UTF8));
+            foreach (var tr in TransformationReaders)
+            {
+                context.AddSource(tr.GetType().Name, SourceText.From(tr.AttributeContent, Encoding.UTF8));
+            }
 
             // retreive the populated receiver 
             if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
                 return;
 
-            var compilation = AddToSyntaxTree(context.Compilation, partialAttributeText);
+            Compilation compilation = context.Compilation;
+            foreach (var tr in TransformationReaders)
+            {
+                compilation = AddToSyntaxTree(compilation, tr.AttributeContent);
+            }
 
-            var partialAttributeType = compilation.GetTypeByMetadataName("SG1.UtilityTypes.PartialAttribute");
             foreach (var candidateTypeNode in receiver.Candidates)
             {
                 var model = compilation.GetSemanticModel(candidateTypeNode.SyntaxTree);
                 var candidateTypeSymbol = model.GetDeclaredSymbol(candidateTypeNode) as ITypeSymbol;
                 if (candidateTypeSymbol == null)
                     continue;
-                foreach (var partialAttribute in candidateTypeSymbol.GetAttributes()
-                    .Where(
-                        _ => _.AttributeClass!.Equals(
-                            partialAttributeType, SymbolEqualityComparer.Default
-                        )
-                    )
-                )
+
+                var transformations = new List<ITransformation>();
+                foreach (var tr in TransformationReaders)
                 {
-                    var sourceType = partialAttribute.ConstructorArguments[0].Value as INamedTypeSymbol;
-                    var wrappingType = partialAttribute.ConstructorArguments[1].Value as string;
-                    var wrapReferenceTypes = partialAttribute.ConstructorArguments[2].Value as bool?;
-                    if (sourceType == null || wrappingType == null || wrapReferenceTypes == null)
-                        continue;
+                    transformations.AddRange(
+                        tr.ReadTransformations(compilation, candidateTypeSymbol)
+                    );
+                }
 
-
+                if (transformations.Any())
+                {
                     var configurationValues = new ConfigurationValues(context, candidateTypeNode.SyntaxTree);
-                    var information = new TransformInformation(candidateTypeSymbol);
-                    information.Transformations.Add(new PartialTransformation(sourceType, wrappingType, wrapReferenceTypes.Value));
+                    var information = new TransformInformation(candidateTypeSymbol, transformations);
                     var content = new ClassBuilder(information, configurationValues).Text;
                     var name = $"{information.InputType.Name}.cs";
                     context.AddSource(name, content);

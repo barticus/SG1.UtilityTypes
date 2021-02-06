@@ -8,6 +8,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Globalization;
+using SG1.UtilityTypes.Transformations;
 
 namespace SG1.UtilityTypes
 {
@@ -29,51 +30,19 @@ namespace SG1.UtilityTypes
             return "";
         }
 
-        private static bool ShouldWrapType(ITypeSymbol type, string? wrappingType, bool wrapReferenceTypes)
+        private static string PrintProperty(IPropertySymbol property, string propertyType, bool shouldIncludeSetter)
         {
-            if (type.IsReferenceType && !wrapReferenceTypes)
-            {
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(wrappingType))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-
-        private static string GetTypeName(ITypeSymbol type, string? wrappingType, bool wrapReferenceTypes)
-        {
-            if (type.IsReferenceType && !wrapReferenceTypes)
-            {
-                return type.ToString();
-            }
-
-            if (string.IsNullOrWhiteSpace(wrappingType))
-            {
-                return type.ToString();
-            }
-
-            return $"{wrappingType}<{type}>";
-        }
-
-        private static string PrintProperty(IPropertySymbol property, string? wrappingType, bool wrapReferenceTypes)
-        {
-            var wrapType = ShouldWrapType(property.Type, wrappingType, wrapReferenceTypes);
             return String.Join(" ", new[] {
                 // needs more work to get comment
                 property.GetDocumentationCommentXml(CultureInfo.InvariantCulture),
                 GetAccessibilityString(property.DeclaredAccessibility),
-                wrapType ? $"{wrappingType}<{property.Type}>" : property.Type.ToString(),
+                propertyType,
                 property.Name,
                 "{",
                 property.GetMethod != null ? "get;" : "",
-                property.SetMethod != null ? "set;" : "",
+                property.SetMethod != null && shouldIncludeSetter ? "set;" : "",
                 "}",
-                property.NullableAnnotation != NullableAnnotation.Annotated  && !wrapType ? " = default!;" : "",
+                property.NullableAnnotation != NullableAnnotation.Annotated  && !(propertyType != property.Type.ToString()) ? "= default!;" : "",
             }.Where(i => i.Any()));
         }
 
@@ -111,18 +80,26 @@ namespace SG1.UtilityTypes
             indentWriter.WriteLine("{");
             indentWriter.Indent++;
 
-            foreach (var partialTransformation in information.Transformations.OfType<PartialTransformation>())
+            var groupedTransformations = information.Transformations.GroupBy(t => t.SourceType);
+            foreach (var transformationsGroup in groupedTransformations)
             {
-                if (partialTransformation == null)
-                    continue;
-
-                foreach (var field in partialTransformation.Fields)
+                var transformations = transformationsGroup.ToArray();
+                var properties = transformationsGroup.Key.GetMembers().OfType<IPropertySymbol>().ToArray();
+                foreach (var property in properties)
                 {
+                    var shouldInclude = transformations.Select(t => t.ShouldIncludeProperty(property)).LastOrDefault();
+                    if (shouldInclude.HasValue && !shouldInclude.Value)
+                    {
+                        continue;
+                    }
+
+                    var propertyType = transformations.Select(t => t.GetPropertyType(property)).LastOrDefault() ?? property.Type.ToString();
+                    var shouldIncludePropertySetter = transformations.Select(t => t.ShouldIncludePropertySetter(property)).LastOrDefault();
                     indentWriter.WriteLine(
                         PrintProperty(
-                            field,
-                            partialTransformation.WrappingType,
-                            partialTransformation.WrapReferenceTypes
+                            property,
+                            propertyType,
+                            shouldIncludePropertySetter ?? true
                         )
                     );
                 }
