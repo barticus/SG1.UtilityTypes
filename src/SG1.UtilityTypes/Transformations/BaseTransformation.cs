@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace SG1.UtilityTypes.Transformations
 {
-    public class BaseTransformation : ITransformation
+    internal abstract class BaseTransformation : ITransformation
     {
         public INamedTypeSymbol SourceType { get; }
 

@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using SG1.UtilityTypes.Configuration;
 using SG1.UtilityTypes.Transformations;
@@ -15,12 +13,14 @@ namespace SG1.UtilityTypes
     [Generator]
     public class UtilityTypeGenerator : ISourceGenerator
     {
-        private ITransformationReader[] TransformationReaders = new ITransformationReader[] {
+        private static ITransformationReader[] TransformationReaders = new ITransformationReader[] {
             new PartialTransformationReader(),
             new PickTransformationReader(),
             new ReadonlyTransformationReader(),
             new OmitTransformationReader(),
         };
+
+        public static string[] AttributeNames => TransformationReaders.Select(tr => tr.FullyQualifiedMetadataName).ToArray();
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -80,25 +80,6 @@ namespace SG1.UtilityTypes
                     var content = new ClassBuilder(information, configurationValues).Text;
                     var name = $"{information.InputType.Name}.cs";
                     context.AddSource(name, content);
-                }
-            }
-        }
-    }
-
-    class SyntaxReceiver : ISyntaxReceiver
-    {
-        public List<TypeDeclarationSyntax> Candidates { get; } = new List<TypeDeclarationSyntax>();
-
-        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
-        {
-            if (syntaxNode is TypeDeclarationSyntax typeDeclarationSyntax)
-            {
-                foreach (var attributeList in typeDeclarationSyntax.AttributeLists)
-                {
-                    if (attributeList.Attributes.Any())
-                    {
-                        this.Candidates.Add(typeDeclarationSyntax);
-                    }
                 }
             }
         }
