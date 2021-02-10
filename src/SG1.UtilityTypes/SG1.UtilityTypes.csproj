@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <PackageId>SG1.UtilityTypes</PackageId>
     <PackageDescription>Utility Type C# Source Generators, inspired by Typescript</PackageDescription>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Authors>Bart Breen</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/barticus/SG1.UtilityTypes</RepositoryUrl>

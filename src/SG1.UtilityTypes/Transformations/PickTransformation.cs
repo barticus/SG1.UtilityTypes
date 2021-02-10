@@ -3,9 +3,11 @@ using Microsoft.CodeAnalysis;
 
 namespace SG1.UtilityTypes.Transformations
 {
-    internal sealed class PickTransformationReader : ITransformationReader
+    internal sealed class PickTransformationReader : BaseTransformationReader
     {
-        public string AttributeContent => @"using System;
+        public override string FullyQualifiedMetadataName => "SG1.UtilityTypes.PickAttribute";
+
+        public override string AttributeContent => @"using System;
 
 namespace SG1.UtilityTypes
 {
@@ -19,23 +21,7 @@ namespace SG1.UtilityTypes
 }
 ";
 
-        public ITransformation[] ReadTransformations(Compilation compilation, ITypeSymbol candidateTypeSymbol)
-        {
-            var attributeType = compilation.GetTypeByMetadataName("SG1.UtilityTypes.PickAttribute");
-            return candidateTypeSymbol
-                .GetAttributes()
-                .Where(
-                    ad => ad.AttributeClass!.Equals(
-                        attributeType, SymbolEqualityComparer.Default
-                    )
-                )
-                .Select(ReadTransformationData)
-                .Where(t => t != null)
-                .Select(t => t!)
-                .ToArray();
-        }
-
-        private static ITransformation? ReadTransformationData(AttributeData attributeData)
+        protected override ITransformation? ReadTransformationData(AttributeData attributeData)
         {
             var sourceType = attributeData.ConstructorArguments[0].Value as INamedTypeSymbol;
             var properties = attributeData.ConstructorArguments[1].Values.Select(v => v.Value).OfType<string>().ToArray<string>() as string[];

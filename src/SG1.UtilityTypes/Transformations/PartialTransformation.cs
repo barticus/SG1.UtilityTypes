@@ -3,9 +3,11 @@ using Microsoft.CodeAnalysis;
 
 namespace SG1.UtilityTypes.Transformations
 {
-    internal sealed class PartialTransformationReader : ITransformationReader
+    internal sealed class PartialTransformationReader : BaseTransformationReader
     {
-        public string AttributeContent => @"using System;
+        public override string FullyQualifiedMetadataName => "SG1.UtilityTypes.PartialAttribute";
+
+        public override string AttributeContent => @"using System;
 
 namespace SG1.UtilityTypes
 {
@@ -19,23 +21,7 @@ namespace SG1.UtilityTypes
 }
 ";
 
-        public ITransformation[] ReadTransformations(Compilation compilation, ITypeSymbol candidateTypeSymbol)
-        {
-            var attributeType = compilation.GetTypeByMetadataName("SG1.UtilityTypes.PartialAttribute");
-            return candidateTypeSymbol
-                .GetAttributes()
-                .Where(
-                    ad => ad.AttributeClass!.Equals(
-                        attributeType, SymbolEqualityComparer.Default
-                    )
-                )
-                .Select(ReadTransformationData)
-                .Where(t => t != null)
-                .Select(t => t!)
-                .ToArray();
-        }
-
-        private static ITransformation? ReadTransformationData(AttributeData partialAttributeData)
+        protected override ITransformation? ReadTransformationData(AttributeData partialAttributeData)
         {
             var sourceType = partialAttributeData.ConstructorArguments[0].Value as INamedTypeSymbol;
             var wrappingType = partialAttributeData.ConstructorArguments[1].Value as string;
@@ -76,7 +62,7 @@ namespace SG1.UtilityTypes
         public override string? GetPropertyType(IPropertySymbol property)
         {
             var wrapType = ShouldWrapType(property.Type, WrappingType, WrapReferenceTypes);
-            return wrapType ? $"{WrappingType}<{property.Type}>" : property.Type.ToString();
+            return wrapType ? $"{WrappingType}<{property.Type}>" : property.Type.WithNullableAnnotation(NullableAnnotation.Annotated).ToString();
         }
     }
 }
