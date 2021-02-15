@@ -13,14 +13,14 @@ namespace SG1.UtilityTypes
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class OmitAttribute : Attribute
     {
-        public OmitAttribute(Type sourceType, string[] properties)
+        public OmitAttribute(Type sourceType, params string[] properties)
         {
         }
     }
 }
 ";
 
-        protected override ITransformation? ReadTransformationData(AttributeData attributeData)
+        protected override ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation)
         {
             var sourceType = attributeData.ConstructorArguments[0].Value as INamedTypeSymbol;
             var properties = attributeData.ConstructorArguments[1].Values.Select(v => v.Value).OfType<string>().ToArray<string>() as string[];

@@ -14,14 +14,14 @@ namespace SG1.UtilityTypes
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class PickAttribute : Attribute
     {
-        public PickAttribute(Type sourceType, string[] properties)
+        public PickAttribute(Type sourceType, params string[] properties)
         {
         }
     }
 }
 ";
 
-        protected override ITransformation? ReadTransformationData(AttributeData attributeData)
+        protected override ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation)
         {
             var sourceType = attributeData.ConstructorArguments[0].Value as INamedTypeSymbol;
             var properties = attributeData.ConstructorArguments[1].Values.Select(v => v.Value).OfType<string>().ToArray<string>() as string[];
@@ -35,6 +35,7 @@ namespace SG1.UtilityTypes
     internal sealed class PickTransformation : BaseTransformation
     {
         private string[] Properties { get; }
+
         public PickTransformation(INamedTypeSymbol sourceType, string[] properties) : base(sourceType)
         {
             Properties = properties;

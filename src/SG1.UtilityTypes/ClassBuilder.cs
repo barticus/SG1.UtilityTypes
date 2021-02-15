@@ -30,19 +30,22 @@ namespace SG1.UtilityTypes
             return "";
         }
 
-        private static string PrintProperty(IPropertySymbol property, string propertyType, bool shouldIncludeSetter)
+        private static string PrintProperty(IPropertySymbol property, ITypeSymbol propertyType, bool shouldIncludeSetter)
         {
+            // assign a default value when the property did not have a nullable annotation and the type has not been changed
+            var needsDefaultValue = property.NullableAnnotation != NullableAnnotation.Annotated && propertyType == property.Type;
+
             return String.Join(" ", new[] {
                 // needs more work to get comment
                 property.GetDocumentationCommentXml(CultureInfo.InvariantCulture),
                 GetAccessibilityString(property.DeclaredAccessibility),
-                propertyType,
+                propertyType.ToString(),
                 property.Name,
                 "{",
                 property.GetMethod != null ? "get;" : "",
                 property.SetMethod != null && shouldIncludeSetter ? "set;" : "",
                 "}",
-                property.NullableAnnotation != NullableAnnotation.Annotated  && !(propertyType != property.Type.ToString()) ? "= default!;" : "",
+                needsDefaultValue ? "= default!;" : "",
             }.Where(i => i.Any()));
         }
 
@@ -87,14 +90,14 @@ namespace SG1.UtilityTypes
                 var properties = transformationsGroup.Key.GetMembers().OfType<IPropertySymbol>().ToArray();
                 foreach (var property in properties)
                 {
-                    var shouldInclude = transformations.Select(t => t.ShouldIncludeProperty(property)).LastOrDefault();
+                    var shouldInclude = transformations.Select(t => t.ShouldIncludeProperty(property)).Where(t => t.HasValue).LastOrDefault();
                     if (shouldInclude.HasValue && !shouldInclude.Value)
                     {
                         continue;
                     }
 
-                    var propertyType = transformations.Select(t => t.GetPropertyType(property)).LastOrDefault() ?? property.Type.ToString();
-                    var shouldIncludePropertySetter = transformations.Select(t => t.ShouldIncludePropertySetter(property)).LastOrDefault();
+                    var propertyType = transformations.Select(t => t.GetPropertyType(property)).Where(t => t != null).LastOrDefault() ?? property.Type;
+                    var shouldIncludePropertySetter = transformations.Select(t => t.ShouldIncludePropertySetter(property)).Where(t => t.HasValue).LastOrDefault();
                     indentWriter.WriteLine(
                         PrintProperty(
                             property,
