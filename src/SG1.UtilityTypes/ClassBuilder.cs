@@ -87,14 +87,14 @@ namespace SG1.UtilityTypes
                 var properties = transformationsGroup.Key.GetMembers().OfType<IPropertySymbol>().ToArray();
                 foreach (var property in properties)
                 {
-                    var shouldInclude = transformations.Select(t => t.ShouldIncludeProperty(property)).LastOrDefault();
+                    var shouldInclude = transformations.Select(t => t.ShouldIncludeProperty(property)).Where(t => t.HasValue).LastOrDefault();
                     if (shouldInclude.HasValue && !shouldInclude.Value)
                     {
                         continue;
                     }
 
-                    var propertyType = transformations.Select(t => t.GetPropertyType(property)).LastOrDefault() ?? property.Type.ToString();
-                    var shouldIncludePropertySetter = transformations.Select(t => t.ShouldIncludePropertySetter(property)).LastOrDefault();
+                    var propertyType = transformations.Select(t => t.GetPropertyType(property)).Where(t => !string.IsNullOrWhiteSpace(t)).LastOrDefault() ?? property.Type.ToString();
+                    var shouldIncludePropertySetter = transformations.Select(t => t.ShouldIncludePropertySetter(property)).Where(t => t.HasValue).LastOrDefault();
                     indentWriter.WriteLine(
                         PrintProperty(
                             property,

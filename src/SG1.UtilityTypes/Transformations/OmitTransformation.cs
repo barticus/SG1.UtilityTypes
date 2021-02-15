@@ -13,7 +13,7 @@ namespace SG1.UtilityTypes
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class OmitAttribute : Attribute
     {
-        public OmitAttribute(Type sourceType, string[] properties)
+        public OmitAttribute(Type sourceType, params string[] properties)
         {
         }
     }
