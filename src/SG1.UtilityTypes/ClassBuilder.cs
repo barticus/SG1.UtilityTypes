@@ -32,6 +32,9 @@ namespace SG1.UtilityTypes
 
         private static string PrintProperty(IPropertySymbol property, ITypeSymbol propertyType, bool shouldIncludeSetter)
         {
+            // assign a default value when the property did not have a nullable annotation and the type has not been changed
+            var needsDefaultValue = property.NullableAnnotation != NullableAnnotation.Annotated && propertyType == property.Type;
+
             return String.Join(" ", new[] {
                 // needs more work to get comment
                 property.GetDocumentationCommentXml(CultureInfo.InvariantCulture),
@@ -42,8 +45,7 @@ namespace SG1.UtilityTypes
                 property.GetMethod != null ? "get;" : "",
                 property.SetMethod != null && shouldIncludeSetter ? "set;" : "",
                 "}",
-                property.NullableAnnotation != NullableAnnotation.Annotated  &&
-                    propertyType.ToString() == property.Type.ToString() ? "= default!;" : "",
+                needsDefaultValue ? "= default!;" : "",
             }.Where(i => i.Any()));
         }
 
