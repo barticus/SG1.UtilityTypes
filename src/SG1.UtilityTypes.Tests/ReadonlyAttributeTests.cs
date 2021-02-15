@@ -57,7 +57,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public string? FirstName { get; }
         public string? LastName { get; }
         public string? Email { get; }
-        public Nullable<int> Age { get; }
+        public int? Age { get; }
     };
 }
 ";

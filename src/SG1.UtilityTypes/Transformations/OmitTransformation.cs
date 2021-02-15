@@ -20,7 +20,7 @@ namespace SG1.UtilityTypes
 }
 ";
 
-        protected override ITransformation? ReadTransformationData(AttributeData attributeData)
+        protected override ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation)
         {
             var sourceType = attributeData.ConstructorArguments[0].Value as INamedTypeSymbol;
             var properties = attributeData.ConstructorArguments[1].Values.Select(v => v.Value).OfType<string>().ToArray<string>() as string[];

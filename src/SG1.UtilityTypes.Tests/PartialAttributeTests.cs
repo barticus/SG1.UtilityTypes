@@ -24,7 +24,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Email { get; set; }
-        public Nullable<int> Age { get; set; }
+        public int? Age { get; set; }
     };
 }
 ";
@@ -42,7 +42,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
 namespace SampleNamespace
 {
-    [Partial(typeof(SG1.UtilityTypes.Tests.SampleClasses.Model1), ""Optional"", true)]
+    [Partial(typeof(SG1.UtilityTypes.Tests.SampleClasses.Model1), typeof(Microsoft.CodeAnalysis.Optional<object>), true)]
     public partial class Model1Partial { }
 }";
             string expectedOutput = @"using System;
@@ -51,10 +51,10 @@ namespace SampleNamespace
 {
     public partial class Model1Partial
     {
-        public Optional<string> FirstName { get; set; }
-        public Optional<string> LastName { get; set; }
-        public Optional<string?> Email { get; set; }
-        public Optional<int> Age { get; set; }
+        public Microsoft.CodeAnalysis.Optional<string> FirstName { get; set; }
+        public Microsoft.CodeAnalysis.Optional<string> LastName { get; set; }
+        public Microsoft.CodeAnalysis.Optional<string?> Email { get; set; }
+        public Microsoft.CodeAnalysis.Optional<int> Age { get; set; }
     };
 }
 ";

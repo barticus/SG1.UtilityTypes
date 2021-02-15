@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -7,6 +8,8 @@ namespace SG1.UtilityTypes.Transformations
     {
         public abstract string FullyQualifiedMetadataName { get; }
         public abstract string AttributeContent { get; }
+
+        public List<Diagnostic> Diagnostics { get; } = new List<Diagnostic>();
 
         public ITransformation[] ReadTransformations(Compilation compilation, ITypeSymbol candidateTypeSymbol)
         {
@@ -18,12 +21,12 @@ namespace SG1.UtilityTypes.Transformations
                         attributeType, SymbolEqualityComparer.Default
                     )
                 )
-                .Select(ReadTransformationData)
+                .Select(ad => ReadTransformationData(ad, compilation))
                 .Where(t => t != null)
                 .Select(t => t!)
                 .ToArray();
         }
 
-        protected abstract ITransformation? ReadTransformationData(AttributeData attributeData);
+        protected abstract ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation);
     }
 }
