@@ -15,7 +15,7 @@ namespace SG1.UtilityTypes
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class PartialAttribute : Attribute
     {
-        public PartialAttribute(Type sourceType, Type? nullableType = null, bool wrapReferenceTypes = false)
+        public PartialAttribute(Type sourceType, Type? nullableType = null, bool wrapAlreadyNullTypes = false)
         {
         }
     }
@@ -55,33 +55,29 @@ namespace SG1.UtilityTypes
     internal sealed class PartialTransformation : BaseTransformation
     {
         public INamedTypeSymbol NullableType { get; }
-        public bool WrapReferenceTypes { get; }
+        public bool WrapAlreadyNullTypes { get; }
 
-        public PartialTransformation(INamedTypeSymbol sourceType, INamedTypeSymbol nullableType, bool wrapReferenceTypes) : base(sourceType)
+        public PartialTransformation(INamedTypeSymbol sourceType, INamedTypeSymbol nullableType, bool wrapAlreadyNullTypes) : base(sourceType)
         {
             NullableType = nullableType;
-            WrapReferenceTypes = wrapReferenceTypes;
+            WrapAlreadyNullTypes = wrapAlreadyNullTypes;
         }
 
-        private bool ShouldWrapType(ITypeSymbol type, INamedTypeSymbol? nullableType, bool wrapReferenceTypes)
+        private bool ShouldWrapType(ITypeSymbol type)
         {
-            if (type.IsReferenceType && !wrapReferenceTypes)
+            if (WrapAlreadyNullTypes)
             {
-                return false;
+                return true;
             }
 
-            if (nullableType == null)
-            {
-                return false;
-            }
-
-            return true;
+            return type.NullableAnnotation != NullableAnnotation.Annotated;
         }
 
-        public override string? GetPropertyType(IPropertySymbol property)
+        public override ITypeSymbol? GetPropertyType(IPropertySymbol property)
         {
-            var wrapType = ShouldWrapType(property.Type, NullableType, WrapReferenceTypes);
-            return wrapType ? NullableType.Construct(property.Type).ToString() : property.Type.WithNullableAnnotation(NullableAnnotation.Annotated).ToString();
+            return ShouldWrapType(property.Type) ?
+                NullableType.Construct(property.Type) :
+                property.Type;
         }
     }
 }

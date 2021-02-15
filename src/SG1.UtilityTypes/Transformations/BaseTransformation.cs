@@ -11,7 +11,7 @@ namespace SG1.UtilityTypes.Transformations
             SourceType = sourceType;
         }
 
-        public virtual string? GetPropertyType(IPropertySymbol property) => null;
+        public virtual ITypeSymbol? GetPropertyType(IPropertySymbol property) => null;
 
         public virtual bool? ShouldIncludeProperty(IPropertySymbol property) => null;
 

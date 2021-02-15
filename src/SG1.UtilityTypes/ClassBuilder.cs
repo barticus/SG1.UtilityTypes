@@ -30,19 +30,20 @@ namespace SG1.UtilityTypes
             return "";
         }
 
-        private static string PrintProperty(IPropertySymbol property, string propertyType, bool shouldIncludeSetter)
+        private static string PrintProperty(IPropertySymbol property, ITypeSymbol propertyType, bool shouldIncludeSetter)
         {
             return String.Join(" ", new[] {
                 // needs more work to get comment
                 property.GetDocumentationCommentXml(CultureInfo.InvariantCulture),
                 GetAccessibilityString(property.DeclaredAccessibility),
-                propertyType,
+                propertyType.ToString(),
                 property.Name,
                 "{",
                 property.GetMethod != null ? "get;" : "",
                 property.SetMethod != null && shouldIncludeSetter ? "set;" : "",
                 "}",
-                property.NullableAnnotation != NullableAnnotation.Annotated  && !(propertyType != property.Type.ToString()) ? "= default!;" : "",
+                property.NullableAnnotation != NullableAnnotation.Annotated  &&
+                    propertyType.ToString() == property.Type.ToString() ? "= default!;" : "",
             }.Where(i => i.Any()));
         }
 
@@ -93,7 +94,7 @@ namespace SG1.UtilityTypes
                         continue;
                     }
 
-                    var propertyType = transformations.Select(t => t.GetPropertyType(property)).Where(t => !string.IsNullOrWhiteSpace(t)).LastOrDefault() ?? property.Type.ToString();
+                    var propertyType = transformations.Select(t => t.GetPropertyType(property)).Where(t => t != null).LastOrDefault() ?? property.Type;
                     var shouldIncludePropertySetter = transformations.Select(t => t.ShouldIncludePropertySetter(property)).Where(t => t.HasValue).LastOrDefault();
                     indentWriter.WriteLine(
                         PrintProperty(

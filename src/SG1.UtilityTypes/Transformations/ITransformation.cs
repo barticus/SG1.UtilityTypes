@@ -6,7 +6,7 @@ namespace SG1.UtilityTypes.Transformations
     {
         INamedTypeSymbol SourceType { get; }
         bool? ShouldIncludeProperty(IPropertySymbol property);
-        string? GetPropertyType(IPropertySymbol property);
+        ITypeSymbol? GetPropertyType(IPropertySymbol property);
         bool? ShouldIncludePropertySetter(IPropertySymbol property);
     }
 }
