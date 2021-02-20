@@ -18,6 +18,7 @@ namespace SG1.UtilityTypes
             new PickTransformationReader(),
             new ReadonlyTransformationReader(),
             new OmitTransformationReader(),
+            new PropertiesOfTransformationReader(),
         };
 
         public static string[] AttributeNames => TransformationReaders.Select(tr => tr.FullyQualifiedMetadataName).ToArray();

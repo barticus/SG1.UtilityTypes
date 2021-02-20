@@ -33,7 +33,8 @@ namespace SG1.UtilityTypes
         private static string PrintProperty(IPropertySymbol property, ITypeSymbol propertyType, bool shouldIncludeSetter)
         {
             // assign a default value when the property did not have a nullable annotation and the type has not been changed
-            var needsDefaultValue = property.NullableAnnotation != NullableAnnotation.Annotated && propertyType == property.Type;
+            var needsDefaultValue = property.NullableAnnotation != NullableAnnotation.Annotated
+                && SymbolEqualityComparer.Default.Equals(propertyType, property.Type);
 
             return String.Join(" ", new[] {
                 // needs more work to get comment
