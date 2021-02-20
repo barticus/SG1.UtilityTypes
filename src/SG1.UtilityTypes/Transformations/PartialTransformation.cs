@@ -15,40 +15,35 @@ namespace SG1.UtilityTypes
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class PartialAttribute : Attribute
     {
-        public PartialAttribute(Type sourceType, Type? nullableType = null, bool wrapAlreadyNullTypes = false)
+        public bool WrapAlreadyNullTypes { get; set; }
+        public Type? NullableType { get; set; }
+
+        public PartialAttribute(Type sourceType)
         {
         }
     }
 }
 ";
 
-        protected override ITransformation? ReadTransformationData(AttributeData partialAttributeData, Compilation compilation)
+        protected override ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation)
         {
-            var sourceType = partialAttributeData.ConstructorArguments[0].Value as INamedTypeSymbol;
-            INamedTypeSymbol nullableType;
-            if (partialAttributeData.ConstructorArguments[1].IsNull)
-            {
-                nullableType = compilation.GetTypeByMetadataName("System.Nullable`1")!;
-            }
-            else if (partialAttributeData.ConstructorArguments[1].Value is INamedTypeSymbol namedTypeSymbol)
-            {
-                nullableType = namedTypeSymbol.ConstructedFrom;
-            }
-            else
-            {
-                throw new InvalidOperationException("Argument could not be read as an INamedTypeSymbol");
-            }
+            var sourceType = GetConstructorArgument<INamedTypeSymbol>(attributeData, 0);
+
+            var specifiedNullableType = GetNamedArgument<INamedTypeSymbol>(attributeData, "NullableType");
+            var nullableType = specifiedNullableType != null ?
+                specifiedNullableType.ConstructedFrom :
+                compilation.GetTypeByMetadataName("System.Nullable`1")!;
             if (!nullableType.IsGenericType || nullableType.TypeArguments.Length != 1)
             {
                 throw new InvalidOperationException($"{nullableType} needs to be a generic type with 1 argument");
                 //     TODO: report diagnostic here
             }
 
-            var wrapReferenceTypes = partialAttributeData.ConstructorArguments[2].Value as bool?;
-            if (sourceType == null || nullableType == null || wrapReferenceTypes == null)
+            var wrapAlreadyNullTypes = GetNamedArgument(attributeData, "WrapAlreadyNullTypes") as bool? ?? false;
+            if (sourceType == null || nullableType == null)
                 return null;
 
-            return new PartialTransformation(sourceType, nullableType, wrapReferenceTypes.Value);
+            return new PartialTransformation(sourceType, nullableType, wrapAlreadyNullTypes);
         }
     }
 

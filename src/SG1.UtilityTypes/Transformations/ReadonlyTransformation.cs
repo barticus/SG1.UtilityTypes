@@ -1,4 +1,3 @@
-using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace SG1.UtilityTypes.Transformations
@@ -23,7 +22,7 @@ namespace SG1.UtilityTypes
 
         protected override ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation)
         {
-            var sourceType = attributeData.ConstructorArguments[0].Value as INamedTypeSymbol;
+            var sourceType = GetConstructorArgument<INamedTypeSymbol>(attributeData, 0);
             if (sourceType == null)
                 return null;
 
