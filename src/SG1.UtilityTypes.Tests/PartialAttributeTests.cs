@@ -36,13 +36,13 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         }
 
         [Test]
-        public void PartialAttributeWithOverrideTest()
+        public void PartialAttributeWithNamedArgumentsOverrideTest()
         {
             string source = @"using SG1.UtilityTypes;
 
 namespace SampleNamespace
 {
-    [Partial(typeof(SG1.UtilityTypes.Tests.SampleClasses.Model1), typeof(Microsoft.CodeAnalysis.Optional<object>), true)]
+    [Partial(typeof(SG1.UtilityTypes.Tests.SampleClasses.Model1), NullableType = typeof(Microsoft.CodeAnalysis.Optional<object>), WrapAlreadyNullTypes = true)]
     public partial class Model1Partial { }
 }";
             string expectedOutput = @"using System;

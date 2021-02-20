@@ -22,8 +22,8 @@ namespace SG1.UtilityTypes
 
         protected override ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation)
         {
-            var sourceType = attributeData.ConstructorArguments[0].Value as INamedTypeSymbol;
-            var properties = attributeData.ConstructorArguments[1].Values.Select(v => v.Value).OfType<string>().ToArray<string>() as string[];
+            var sourceType = GetConstructorArgument<INamedTypeSymbol>(attributeData, 0);
+            var properties = GetConstructorArgumentValues<string>(attributeData, 1);
             if (sourceType == null || properties == null || !properties.Any())
                 return null;
 
