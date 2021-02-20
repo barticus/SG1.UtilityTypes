@@ -41,7 +41,7 @@ Commonly used for updates, etc.
 The `Partial` Utility Type can help you!
 Instead of manually keeping your update model up to date, you can simply write
 
-```charp
+```csharp
 [Partial(typeof(Profile))]
 public partial class ProfileUpdate { }
 ```
@@ -55,7 +55,7 @@ Sometimes you need a copy of a class but with only certain properties.
 The Pick attribute can be used to transform a given class (let's use `Profile` from above), with the following syntax
 
 ```csharp
-[Pick(typeof(Profile), new string[] { nameof(Profile.FirstName) })]
+[Pick(typeof(Profile), nameof(Profile.FirstName))]
 public partial class ProfilePickedFirstName { }
 ```
 
@@ -77,7 +77,7 @@ Sometimes you need a copy of a class but with a certain property hidden.
 The Omit attribute can be used to transform a given class (let's use `Profile` from above), with the following syntax
 
 ```csharp
-[Omit(typeof(Profile), new string[] { nameof(Profile.Age) })]
+[Omit(typeof(Profile), nameof(Profile.Age))]
 public partial class ProfileOmittedAge { }
 ```
 
@@ -125,7 +125,7 @@ For example, if I wanted an update model just for the name fields of the profile
 ```csharp
 [
     Partial(typeof(Profile)),
-    Pick(typeof(Profile), new string[] { nameof(Profile.FirstName), nameof(Profile.LastName) })
+    Pick(typeof(Profile), nameof(Profile.FirstName), nameof(Profile.LastName))
 ]
 public partial class ProfileNamesUpdateModel { }
 ```
