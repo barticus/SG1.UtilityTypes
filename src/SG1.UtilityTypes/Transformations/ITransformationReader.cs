@@ -6,6 +6,6 @@ namespace SG1.UtilityTypes.Transformations
     {
         string FullyQualifiedMetadataName { get; }
         string AttributeContent { get; }
-        ITransformation[] ReadTransformations(Compilation compilation, ITypeSymbol candidateTypeSymbol);
+        ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation);
     }
 }

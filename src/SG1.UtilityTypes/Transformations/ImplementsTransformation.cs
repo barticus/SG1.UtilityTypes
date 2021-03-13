@@ -2,18 +2,18 @@ using Microsoft.CodeAnalysis;
 
 namespace SG1.UtilityTypes.Transformations
 {
-    internal sealed class ReadonlyTransformationReader : ApplyTransformationReader
+    internal sealed class ImplementsTransformationReader : ApplyTransformationReader
     {
-        public override string FullyQualifiedMetadataName => "SG1.UtilityTypes.ReadonlyAttribute";
+        public override string FullyQualifiedMetadataName => "SG1.UtilityTypes.ImplementsAttribute";
 
         public override string AttributeContent => @"using System;
 
 namespace SG1.UtilityTypes
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-    public sealed class ReadonlyAttribute : ApplyTransformAttribute
+    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
+    public sealed class ImplementsAttribute : ApplyTransformAttribute
     {
-        public ReadonlyAttribute(Type sourceType): base(sourceType)
+        public ImplementsAttribute(Type sourceType): base(sourceType)
         {
         }
     }
@@ -26,7 +26,7 @@ namespace SG1.UtilityTypes
             if (applyTransform == null)
                 return null;
 
-            applyTransform.IsReadonly = true;
+            applyTransform.IsReadonly = applyTransform.IsReadonly ?? false;
 
             return applyTransform;
         }

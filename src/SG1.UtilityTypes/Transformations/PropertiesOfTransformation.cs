@@ -1,9 +1,8 @@
-using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace SG1.UtilityTypes.Transformations
 {
-    internal sealed class PropertiesOfTransformationReader : BaseTransformationReader
+    internal sealed class PropertiesOfTransformationReader : ApplyTransformationReader
     {
         public override string FullyQualifiedMetadataName => "SG1.UtilityTypes.PropertiesOfAttribute";
 
@@ -11,28 +10,14 @@ namespace SG1.UtilityTypes.Transformations
 
 namespace SG1.UtilityTypes
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-    public sealed class PropertiesOfAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
+    public sealed class PropertiesOfAttribute : ApplyTransformAttribute
     {
-        public PropertiesOfAttribute(Type sourceType)
+        public PropertiesOfAttribute(Type sourceType): base(sourceType)
         {
         }
     }
 }
 ";
-
-        protected override ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation)
-        {
-            var sourceType = GetConstructorArgument<INamedTypeSymbol>(attributeData, 0);
-            if (sourceType == null)
-                return null;
-
-            return new PropertiesOfTransformation(sourceType);
-        }
-    }
-
-    internal sealed class PropertiesOfTransformation : BaseTransformation
-    {
-        public PropertiesOfTransformation(INamedTypeSymbol sourceType) : base(sourceType) { }
     }
 }

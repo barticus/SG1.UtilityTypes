@@ -11,22 +11,6 @@ namespace SG1.UtilityTypes.Transformations
 
         public List<Diagnostic> Diagnostics { get; } = new List<Diagnostic>();
 
-        public ITransformation[] ReadTransformations(Compilation compilation, ITypeSymbol candidateTypeSymbol)
-        {
-            var attributeType = compilation.GetTypeByMetadataName(FullyQualifiedMetadataName);
-            return candidateTypeSymbol
-                .GetAttributes()
-                .Where(
-                    ad => ad.AttributeClass!.Equals(
-                        attributeType, SymbolEqualityComparer.Default
-                    )
-                )
-                .Select(ad => ReadTransformationData(ad, compilation))
-                .Where(t => t != null)
-                .Select(t => t!)
-                .ToArray();
-        }
-
         protected object? GetConstructorArgument(AttributeData attributeData, int index)
         {
             if (attributeData.ConstructorArguments.Length > index)
@@ -67,6 +51,21 @@ namespace SG1.UtilityTypes.Transformations
         protected T? GetNamedArgument<T>(AttributeData attributeData, string key) where T : class =>
             GetNamedArgument(attributeData, key) as T;
 
-        protected abstract ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation);
+        protected object[]? GetNamedArguments(AttributeData attributeData, string key)
+        {
+            if (attributeData.NamedArguments.Any(a => a.Key == key))
+            {
+                return attributeData.NamedArguments.First(a => a.Key == key).Value.Values
+                    .Where(v => v.Value != null)
+                    .Select(v => v.Value!)
+                    .ToArray();
+            }
+            return null;
+        }
+
+        protected T[]? GetNamedArguments<T>(AttributeData attributeData, string key) where T : class =>
+            GetNamedArguments(attributeData, key)?.OfType<T>().ToArray();
+
+        public abstract ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation);
     }
 }

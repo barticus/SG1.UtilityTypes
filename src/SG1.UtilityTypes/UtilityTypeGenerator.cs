@@ -14,11 +14,13 @@ namespace SG1.UtilityTypes
     public class UtilityTypeGenerator : ISourceGenerator
     {
         private static ITransformationReader[] TransformationReaders = new ITransformationReader[] {
+            new ApplyTransformationReader(),
             new PartialTransformationReader(),
             new PickTransformationReader(),
             new ReadonlyTransformationReader(),
             new OmitTransformationReader(),
             new PropertiesOfTransformationReader(),
+            new ImplementsTransformationReader(),
         };
 
         public static string[] AttributeNames => TransformationReaders.Select(tr => tr.FullyQualifiedMetadataName).ToArray();
@@ -40,6 +42,17 @@ namespace SG1.UtilityTypes
                 throw new InvalidOperationException("Options is not CSharpParseOptions");
             }
             return compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(text, Encoding.UTF8), options));
+        }
+
+        private ITransformation[] ReadTransformations(Compilation compilation, ITypeSymbol candidateTypeSymbol)
+        {
+            var attributeTypesToReader = TransformationReaders.ToDictionary(tr => compilation.GetTypeByMetadataName(tr.FullyQualifiedMetadataName));
+            return candidateTypeSymbol
+                .GetAttributes()
+                .SelectMany(ad => attributeTypesToReader.Where(kvp => ad.AttributeClass!.Equals(kvp.Key, SymbolEqualityComparer.Default)).Select(kvp => kvp.Value.ReadTransformationData(ad, compilation)))
+                .Where(t => t != null)
+                .Select(t => t!)
+                .ToArray();
         }
 
         public void Execute(GeneratorExecutionContext context)
@@ -66,13 +79,7 @@ namespace SG1.UtilityTypes
                 if (candidateTypeSymbol == null)
                     continue;
 
-                var transformations = new List<ITransformation>();
-                foreach (var tr in TransformationReaders)
-                {
-                    transformations.AddRange(
-                        tr.ReadTransformations(compilation, candidateTypeSymbol)
-                    );
-                }
+                var transformations = ReadTransformations(compilation, candidateTypeSymbol);
 
                 if (transformations.Any())
                 {

@@ -109,13 +109,82 @@ will produce a generated source of:
 ```csharp
 public partial class ProfileReadonly
 {
-    public string FirstName { get; } = default!;
-    public string LastName { get; } = default!;
+    public string FirstName { get; }
+    public string LastName { get; }
     public int Age { get; }
 }
 ```
 
 where all property setters have been removed. You will need to write constructors in order to initialise the properties.
+
+## Implements
+
+Sometimes you want to implement a model interface. The ImplementsAttribute can help out with keeping your code DRY.
+
+Given the interface
+
+```csharp
+public interface IProfile
+{
+    string FirstName { get; }
+    string LastName { get; }
+    int Age { get; set; }
+}
+```
+
+```csharp
+[Implements(typeof(IProfile))]
+public partial class ProfileImplementation { }
+```
+
+will produce a generated source of:
+
+```csharp
+public partial class ProfileImplementation
+{
+    public string FirstName { get; set; } = default!;
+    public string LastName { get; set;  } = default!;
+    public int Age { get; set; }
+}
+```
+
+By default, setters will be added. This behaviour can be overridden by adding the `IsReadonly = true` parameter to the attribute.
+
+## PropertiesOf
+
+This attribute will allow you to copy properties from a source type with no other transformation applied.
+For example if I had the Profile class above, as well as this class
+
+```csharp
+public partial class ExtendedProfile
+{
+    public string Bio { get; set; } = default!;
+    public string Website { get; set; } = default!;
+}
+```
+
+I could combine the properties of both
+
+```csharp
+[
+    PropertiesOf(typeof(Profile)),
+    PropertiesOf(typeof(ExtendedProfile)),
+]
+public partial class FullProfile { }
+```
+
+will produce a generated source of:
+
+```csharp
+public partial class ProfileImplementation
+{
+    public string FirstName { get; set; } = default!;
+    public string LastName { get; set;  } = default!;
+    public int Age { get; set; }
+    public string Bio { get; set; } = default!;
+    public string Website { get; set; } = default!;
+}
+```
 
 ## Combine them together
 
@@ -175,6 +244,16 @@ public partial class ProfileNamesUpdateModel
 As there may be some conflicting rules, the "latest attribute" will break any ties.
 
 Transformations are grouped by source type before being resolved.
+
+## Common Attribute Parameters
+
+All transform attributes inherit the following parameters which you can use to modify the behaviour of the attribute you're using.
+
+These attributes are:
+
+1. `IsReadonly` This named parameter controls whether setters will be added to properties. If you are setting this to `true`, it is a shorthand for also adding the `[Readonly]` attribute. Setting this to false will add setters to properties that did not have them, such as if you wanted to implement an interface.
+2. `IncludeProperties` This named parameter controls the properties that should be included from the Source type. This is a shorthand for also adding the `[Pick]` attribute
+3. `ExcludeProperties` This named parameter controls the properties that should be excluded from the Source type. This is a shorthand for also adding the `[Omit]` attribute
 
 ## Contributing
 

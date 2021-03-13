@@ -33,7 +33,7 @@ namespace SG1.UtilityTypes
         private static string PrintProperty(IPropertySymbol property, ITypeSymbol propertyType, bool shouldIncludeSetter)
         {
             // assign a default value when the property did not have a nullable annotation and the type has not been changed
-            var needsDefaultValue = property.NullableAnnotation != NullableAnnotation.Annotated
+            var needsDefaultValue = shouldIncludeSetter && property.NullableAnnotation != NullableAnnotation.Annotated
                 && SymbolEqualityComparer.Default.Equals(propertyType, property.Type);
 
             return String.Join(" ", new[] {
@@ -43,8 +43,8 @@ namespace SG1.UtilityTypes
                 propertyType.ToString(),
                 property.Name,
                 "{",
-                property.GetMethod != null ? "get;" : "",
-                property.SetMethod != null && shouldIncludeSetter ? "set;" : "",
+                "get;",
+                shouldIncludeSetter ? "set;" : "",
                 "}",
                 needsDefaultValue ? "= default!;" : "",
             }.Where(i => i.Any()));
@@ -103,7 +103,7 @@ namespace SG1.UtilityTypes
                         PrintProperty(
                             property,
                             propertyType,
-                            shouldIncludePropertySetter ?? true
+                            shouldIncludePropertySetter ?? property.SetMethod != null
                         )
                     );
                 }
