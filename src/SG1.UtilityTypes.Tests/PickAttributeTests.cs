@@ -60,7 +60,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         }
 
         [Test]
-        public void Test3()
+        public void ReadonlyAndPickCombination()
         {
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
@@ -69,16 +69,16 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         SG1.UtilityTypes.Readonly(typeof(Model1)),
         SG1.UtilityTypes.Pick(typeof(Model1), ""FirstName"")
     ]
-    public partial class Model1Picked { }
+    public partial class ReadonlyAndPickCombination { }
 }";
 
             string expectedOutput = @"using System;
 
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    public partial class Model1Picked
+    public partial class ReadonlyAndPickCombination
     {
-        public string FirstName { get; } = default!;
+        public string FirstName { get; }
     };
 }
 ";

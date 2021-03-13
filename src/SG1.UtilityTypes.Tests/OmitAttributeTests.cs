@@ -6,20 +6,20 @@ namespace SG1.UtilityTypes.Tests
     {
 
         [Test]
-        public void Test1()
+        public void Model1OmittedArray()
         {
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     [SG1.UtilityTypes.Omit(typeof(Model1), new string[] { ""FirstName"" })]
-    public partial class Model1Partial { }
+    public partial class Model1OmittedArray { }
 }";
 
             string expectedOutput = @"using System;
 
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    public partial class Model1Partial
+    public partial class Model1OmittedArray
     {
         public string LastName { get; set; } = default!;
         public string? Email { get; set; }
@@ -35,20 +35,20 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         }
 
         [Test]
-        public void Test2()
+        public void Model1OmittedParams()
         {
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     [SG1.UtilityTypes.Omit(typeof(Model1), ""FirstName"")]
-    public partial class Model1Partial { }
+    public partial class Model1OmittedParams { }
 }";
 
             string expectedOutput = @"using System;
 
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    public partial class Model1Partial
+    public partial class Model1OmittedParams
     {
         public string LastName { get; set; } = default!;
         public string? Email { get; set; }
@@ -64,7 +64,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         }
 
         [Test]
-        public void Test3()
+        public void PartialAndOmittedCombination()
         {
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
@@ -73,14 +73,14 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         SG1.UtilityTypes.Partial(typeof(Model1)),
         SG1.UtilityTypes.Omit(typeof(Model1), ""FirstName"")
     ]
-    public partial class Model1Partial { }
+    public partial class PartialAndOmittedCombination { }
 }";
 
             string expectedOutput = @"using System;
 
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    public partial class Model1Partial
+    public partial class PartialAndOmittedCombination
     {
         public string? LastName { get; set; }
         public string? Email { get; set; }

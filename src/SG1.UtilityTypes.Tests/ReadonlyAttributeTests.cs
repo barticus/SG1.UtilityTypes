@@ -21,10 +21,10 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class Model1Partial
     {
-        public string FirstName { get; } = default!;
-        public string LastName { get; } = default!;
+        public string FirstName { get; }
+        public string LastName { get; }
         public string? Email { get; }
-        public int Age { get; } = default!;
+        public int Age { get; }
     };
 }
 ";

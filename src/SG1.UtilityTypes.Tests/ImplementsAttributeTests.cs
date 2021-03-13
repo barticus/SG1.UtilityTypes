@@ -2,24 +2,24 @@ using NUnit.Framework;
 
 namespace SG1.UtilityTypes.Tests
 {
-    public class PropertiesOfAttributeTests
+    public class ImplementsAttributeTests
     {
 
         [Test]
-        public void PropertiesOfModel1()
+        public void ImplementsModel1()
         {
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    [SG1.UtilityTypes.PropertiesOf(typeof(Model1))]
-    public partial class PropertiesOfModel1 { }
+    [SG1.UtilityTypes.Implements(typeof(Model1))]
+    public partial class ImplementsModel1 { }
 }";
 
             string expectedOutput = @"using System;
 
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    public partial class PropertiesOfModel1
+    public partial class ImplementsModel1
     {
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
@@ -36,20 +36,20 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         }
 
         [Test]
-        public void PropertiesOfModel3()
+        public void ImplementsModel3()
         {
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    [SG1.UtilityTypes.PropertiesOf(typeof(Model3))]
-    public partial class PropertiesOfModel3 { }
+    [SG1.UtilityTypes.Implements(typeof(Model3))]
+    public partial class ImplementsModel3 { }
 }";
 
             string expectedOutput = @"using System;
 
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    public partial class PropertiesOfModel3
+    public partial class ImplementsModel3
     {
         public System.Collections.Generic.List<string>? FamilyMembers { get; set; }
     };
@@ -68,7 +68,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    [SG1.UtilityTypes.PropertiesOf(typeof(IModel1))]
+    [SG1.UtilityTypes.Implements(typeof(IModel1))]
     public partial class InterfaceTestDefault { }
 }";
 
@@ -78,10 +78,10 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class InterfaceTestDefault
     {
-        public string FirstName { get; }
-        public string LastName { get; }
-        public string? Email { get; }
-        public int Age { get; }
+        public string FirstName { get; set; } = default!;
+        public string LastName { get; set; } = default!;
+        public string? Email { get; set; }
+        public int Age { get; set; } = default!;
     };
 }
 ";
@@ -99,7 +99,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     [
-        SG1.UtilityTypes.PropertiesOf(typeof(IModel1)),
+        SG1.UtilityTypes.Implements(typeof(IModel1)),
         SG1.UtilityTypes.Readonly(typeof(IModel1))
     ]
     public partial class InterfaceTestReadonlyAttribute { }
@@ -131,7 +131,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    [SG1.UtilityTypes.PropertiesOf(typeof(IModel1), IsReadonly = true)]
+    [SG1.UtilityTypes.Implements(typeof(IModel1), IsReadonly = true)]
     public partial class InterfaceTestReadonlyProperty { }
 }";
 
@@ -161,7 +161,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
             string source = @"
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
-    [SG1.UtilityTypes.PropertiesOf(typeof(Model1), IsReadonly = true, IncludeProperties = new string[] { ""FirstName"" })]
+    [SG1.UtilityTypes.Implements(typeof(Model1), IsReadonly = true, IncludeProperties = new string[] { ""FirstName"" })]
     public partial class InheritedPropertiesTest { }
 }";
 

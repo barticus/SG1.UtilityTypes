@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 
 namespace SG1.UtilityTypes.Transformations
 {
-    internal sealed class PartialTransformationReader : BaseTransformationReader
+    internal sealed class PartialTransformationReader : ApplyTransformationReader
     {
         public override string FullyQualifiedMetadataName => "SG1.UtilityTypes.PartialAttribute";
 
@@ -13,22 +13,21 @@ namespace SG1.UtilityTypes.Transformations
 namespace SG1.UtilityTypes
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-    public sealed class PartialAttribute : Attribute
+    public sealed class PartialAttribute : ApplyTransformAttribute
     {
         public bool WrapAlreadyNullTypes { get; set; }
         public Type? NullableType { get; set; }
 
-        public PartialAttribute(Type sourceType)
+        public PartialAttribute(Type sourceType): base(sourceType)
         {
         }
     }
 }
 ";
 
-        protected override ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation)
+        public override ITransformation? ReadTransformationData(AttributeData attributeData, Compilation compilation)
         {
-            var sourceType = GetConstructorArgument<INamedTypeSymbol>(attributeData, 0);
-
+            var applyTransform = this.ReadApplyTransform(attributeData, compilation);
             var specifiedNullableType = GetNamedArgument<INamedTypeSymbol>(attributeData, "NullableType");
             var nullableType = specifiedNullableType != null ?
                 specifiedNullableType.ConstructedFrom :
@@ -40,19 +39,19 @@ namespace SG1.UtilityTypes
             }
 
             var wrapAlreadyNullTypes = GetNamedArgument(attributeData, "WrapAlreadyNullTypes") as bool? ?? false;
-            if (sourceType == null || nullableType == null)
+            if (applyTransform == null || nullableType == null)
                 return null;
 
-            return new PartialTransformation(sourceType, nullableType, wrapAlreadyNullTypes);
+            return new PartialTransformation(applyTransform, nullableType, wrapAlreadyNullTypes);
         }
     }
 
-    internal sealed class PartialTransformation : BaseTransformation
+    internal sealed class PartialTransformation : ApplyTransform
     {
         public INamedTypeSymbol NullableType { get; }
         public bool WrapAlreadyNullTypes { get; }
 
-        public PartialTransformation(INamedTypeSymbol sourceType, INamedTypeSymbol nullableType, bool wrapAlreadyNullTypes) : base(sourceType)
+        public PartialTransformation(ApplyTransform applyTransform, INamedTypeSymbol nullableType, bool wrapAlreadyNullTypes) : base(applyTransform)
         {
             NullableType = nullableType;
             WrapAlreadyNullTypes = wrapAlreadyNullTypes;
