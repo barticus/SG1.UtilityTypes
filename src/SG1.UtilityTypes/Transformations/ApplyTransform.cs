@@ -14,9 +14,9 @@ namespace SG1.UtilityTypes
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public class ApplyTransformAttribute : Attribute
     {
-        public bool IsReadonly { get; set; }
-        public string[] IncludeProperties { get; set; }
-        public string[] ExcludeProperties { get; set; }
+        public bool IsReadonly { get; set; } = default!;
+        public string[] IncludeProperties { get; set; } = default!;
+        public string[] ExcludeProperties { get; set; } = default!;
         public ApplyTransformAttribute(Type sourceType)
         {
         }

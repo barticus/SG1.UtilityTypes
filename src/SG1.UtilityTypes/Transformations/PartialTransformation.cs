@@ -18,7 +18,7 @@ namespace SG1.UtilityTypes
         public bool WrapAlreadyNullTypes { get; set; }
         public Type? NullableType { get; set; }
 
-        public PartialAttribute(Type sourceType)
+        public PartialAttribute(Type sourceType): base(sourceType)
         {
         }
     }
