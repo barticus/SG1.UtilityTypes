@@ -46,10 +46,13 @@ namespace SG1.UtilityTypes
 
         private ITransformation[] ReadTransformations(Compilation compilation, ITypeSymbol candidateTypeSymbol)
         {
-            var attributeTypesToReader = TransformationReaders.ToDictionary(tr => compilation.GetTypeByMetadataName(tr.FullyQualifiedMetadataName));
+            var attributeTypesToReader = TransformationReaders.ToDictionary(tr => compilation.GetTypeByMetadataName(tr.FullyQualifiedMetadataName)!);
             return candidateTypeSymbol
                 .GetAttributes()
-                .SelectMany(ad => attributeTypesToReader.Where(kvp => ad.AttributeClass!.Equals(kvp.Key, SymbolEqualityComparer.Default)).Select(kvp => kvp.Value.ReadTransformationData(ad, compilation)))
+                .SelectMany(ad => attributeTypesToReader
+                    .Where(kvp => ad.AttributeClass!.Equals(kvp.Key, SymbolEqualityComparer.Default))
+                    .Select(kvp => kvp.Value.ReadTransformationData(ad, compilation))
+                )
                 .Where(t => t != null)
                 .Select(t => t!)
                 .ToArray();

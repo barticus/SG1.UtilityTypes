@@ -36,6 +36,54 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         }
 
         [Test]
+        public void ModelWithCommentsTest()
+        {
+            string source = @"
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+
+    public class ModelWithComments
+    {
+        /// <summary>
+        /// The first name
+        /// </summary>
+        public string FirstName { get; set; } = default!;
+
+        /// <summary>
+        /// The last name
+        /// </summary>
+        public string LastName { get; set; } = default!;
+    }
+
+    [Partial(typeof(ModelWithComments))]
+    public partial class ModelWithCommentsPartial { }
+}";
+
+            string expectedOutput = @"using System;
+
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+    public partial class ModelWithCommentsPartial
+    {
+        /// <summary>
+        /// The first name
+        /// </summary>
+        public string? FirstName { get; set; }
+        /// <summary>
+        /// The last name
+        /// </summary>
+        public string? LastName { get; set; }
+    };
+}
+";
+            string output = TestUtilities.GetGeneratedOutput(source);
+
+            Assert.NotNull(output);
+
+            Assert.AreEqual(expectedOutput, output);
+        }
+
+        [Test]
         public void PartialAttributeWithNamedArgumentsOverrideTest()
         {
             string source = @"using SG1.UtilityTypes;
