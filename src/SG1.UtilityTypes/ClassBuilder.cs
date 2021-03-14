@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Globalization;
 using SG1.UtilityTypes.Transformations;
+using System.Xml;
 
 namespace SG1.UtilityTypes
 {
@@ -30,24 +31,36 @@ namespace SG1.UtilityTypes
             return "";
         }
 
-        private static string PrintProperty(IPropertySymbol property, ITypeSymbol propertyType, bool shouldIncludeSetter)
+        private static void PrintProperty(TextWriter tw, IPropertySymbol property, ITypeSymbol propertyType, bool shouldIncludeSetter)
         {
             // assign a default value when the property did not have a nullable annotation and the type has not been changed
             var needsDefaultValue = shouldIncludeSetter && property.NullableAnnotation != NullableAnnotation.Annotated
                 && SymbolEqualityComparer.Default.Equals(propertyType, property.Type);
 
-            return String.Join(" ", new[] {
-                // needs more work to get comment
-                property.GetDocumentationCommentXml(CultureInfo.InvariantCulture),
-                GetAccessibilityString(property.DeclaredAccessibility),
-                propertyType.ToString(),
-                property.Name,
-                "{",
-                "get;",
-                shouldIncludeSetter ? "set;" : "",
-                "}",
-                needsDefaultValue ? "= default!;" : "",
-            }.Where(i => i.Any()));
+            var lines = new List<string>();
+            var commentXml = property.GetDocumentationCommentXml(CultureInfo.InvariantCulture);
+            if (!string.IsNullOrWhiteSpace(commentXml))
+            {
+                var xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(commentXml);
+                foreach (var line in xmlDoc.FirstChild.InnerXml.Split(new[] { "\n" }, new StringSplitOptions()))
+                {
+                    tw.WriteLine("/// " + line.Trim());
+                }
+            }
+
+            tw.WriteLine(
+                String.Join(" ", new[] {
+                    GetAccessibilityString(property.DeclaredAccessibility),
+                    propertyType.ToString(),
+                    property.Name,
+                    "{",
+                    "get;",
+                    shouldIncludeSetter ? "set;" : "",
+                    "}",
+                    needsDefaultValue ? "= default!;" : "",
+                }.Where(i => !string.IsNullOrWhiteSpace(i)))
+            );
         }
 
         private static SourceText Build(TransformInformation information, ConfigurationValues configurationValues)
@@ -99,12 +112,11 @@ namespace SG1.UtilityTypes
 
                     var propertyType = transformations.Select(t => t.GetPropertyType(property)).Where(t => t != null).LastOrDefault() ?? property.Type;
                     var shouldIncludePropertySetter = transformations.Select(t => t.ShouldIncludePropertySetter(property)).Where(t => t.HasValue).LastOrDefault();
-                    indentWriter.WriteLine(
-                        PrintProperty(
-                            property,
-                            propertyType,
-                            shouldIncludePropertySetter ?? property.SetMethod != null
-                        )
+                    PrintProperty(
+                        indentWriter,
+                        property,
+                        propertyType,
+                        shouldIncludePropertySetter ?? property.SetMethod != null
                     );
                 }
             }
