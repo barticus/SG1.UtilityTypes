@@ -17,6 +17,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class Model1OmittedArray
@@ -26,6 +27,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public int Age { get; set; } = default!;
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -46,6 +48,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class Model1OmittedParams
@@ -55,6 +58,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public int Age { get; set; } = default!;
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -78,6 +82,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class PartialAndOmittedCombination
@@ -87,6 +92,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public int? Age { get; set; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 

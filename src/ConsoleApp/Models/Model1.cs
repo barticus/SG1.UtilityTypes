@@ -1,3 +1,4 @@
+#nullable enable
 namespace ConsoleApp.Models
 {
     public class Model1
@@ -23,3 +24,4 @@ namespace ConsoleApp.Models
         public int Age { get; set; }
     }
 }
+#nullable restore

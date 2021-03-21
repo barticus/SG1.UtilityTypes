@@ -86,6 +86,8 @@ namespace SG1.UtilityTypes
                 indentWriter.WriteLine();
             }
 
+            indentWriter.WriteLine("#nullable enable");
+
             if (!information.InputType.ContainingNamespace.IsGlobalNamespace)
             {
                 indentWriter.WriteLine($"namespace {information.InputType.ContainingNamespace.ToDisplayString()}");
@@ -134,6 +136,8 @@ namespace SG1.UtilityTypes
                 indentWriter.Indent--;
                 indentWriter.WriteLine("}");
             }
+
+            indentWriter.WriteLine("#nullable restore");
 
             return SourceText.From(writer.ToString(), Encoding.UTF8);
         }

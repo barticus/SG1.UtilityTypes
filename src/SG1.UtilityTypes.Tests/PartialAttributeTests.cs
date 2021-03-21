@@ -17,6 +17,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class Model1Partial
@@ -27,6 +28,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public int? Age { get; set; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -61,6 +63,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class ModelWithCommentsPartial
@@ -75,6 +78,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public string? LastName { get; set; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -95,6 +99,7 @@ namespace SampleNamespace
 }";
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SampleNamespace
 {
     public partial class Model1Partial
@@ -105,6 +110,7 @@ namespace SampleNamespace
         public Microsoft.CodeAnalysis.Optional<int> Age { get; set; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
