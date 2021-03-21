@@ -8,6 +8,7 @@ namespace SG1.UtilityTypes.Transformations
 
         public override string AttributeContent => @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
@@ -18,6 +19,7 @@ namespace SG1.UtilityTypes
         }
     }
 }
+#nullable restore
 ";
     }
 }

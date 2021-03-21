@@ -9,6 +9,7 @@ namespace SG1.UtilityTypes.Transformations
         public override string FullyQualifiedMetadataName => "SG1.UtilityTypes.ApplyTransformAttribute";
         public override string AttributeContent => @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
@@ -22,6 +23,7 @@ namespace SG1.UtilityTypes
         }
     }
 }
+#nullable restore
 ";
 
         protected ApplyTransform? ReadApplyTransform(AttributeData attributeData, Compilation compilation)

@@ -17,6 +17,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class Model1Partial
@@ -24,6 +25,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public string FirstName { get; set; } = default!;
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -44,6 +46,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class Model3Picked
@@ -51,6 +54,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public System.Collections.Generic.List<string>? FamilyMembers { get; set; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -74,6 +78,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class ReadonlyAndPickCombination
@@ -81,6 +86,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public string FirstName { get; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 

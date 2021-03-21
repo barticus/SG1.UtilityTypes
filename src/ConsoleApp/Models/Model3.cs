@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+#nullable enable
 namespace ConsoleApp.Models
 {
     public class Model3
@@ -10,3 +11,4 @@ namespace ConsoleApp.Models
         public List<string>? FamilyMembers { get; set; }
     }
 }
+#nullable restore

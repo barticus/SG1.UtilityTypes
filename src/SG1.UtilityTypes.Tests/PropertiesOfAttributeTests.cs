@@ -17,6 +17,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class PropertiesOfModel1
@@ -27,6 +28,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public int Age { get; set; } = default!;
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -47,6 +49,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class PropertiesOfModel3
@@ -54,6 +57,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public System.Collections.Generic.List<string>? FamilyMembers { get; set; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -74,6 +78,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class InterfaceTestDefault
@@ -84,6 +89,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public int Age { get; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -107,6 +113,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class InterfaceTestReadonlyAttribute
@@ -117,6 +124,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public int Age { get; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -137,6 +145,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class InterfaceTestReadonlyProperty
@@ -147,6 +156,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public int Age { get; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
@@ -167,6 +177,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             string expectedOutput = @"using System;
 
+#nullable enable
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public partial class InheritedPropertiesTest
@@ -174,6 +185,7 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         public string FirstName { get; }
     };
 }
+#nullable restore
 ";
             string output = TestUtilities.GetGeneratedOutput(source);
 
