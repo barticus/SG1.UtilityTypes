@@ -31,7 +31,13 @@ namespace SG1.UtilityTypes
             return "";
         }
 
-        private static void PrintProperty(TextWriter tw, IPropertySymbol property, ITypeSymbol propertyType, bool shouldIncludeSetter)
+        private static void PrintProperty(
+            TextWriter tw,
+            IPropertySymbol property,
+            ITypeSymbol propertyType,
+            bool shouldIncludeSetter,
+            bool includeAttributes
+        )
         {
             // assign a default value when the property did not have a nullable annotation and the type has not been changed
             var needsDefaultValue = shouldIncludeSetter && property.NullableAnnotation != NullableAnnotation.Annotated
@@ -46,6 +52,17 @@ namespace SG1.UtilityTypes
                 foreach (var line in xmlDoc.FirstChild.InnerXml.Split(new[] { "\n" }, new StringSplitOptions()))
                 {
                     tw.WriteLine("/// " + line.Trim());
+                }
+            }
+
+            if (includeAttributes)
+            {
+                var attributes = property
+                    .GetAttributes()
+                    .Where(ad => ad.AttributeClass?.ContainingNamespace.ToString() != "System.Runtime.CompilerServices");
+                foreach (var attribute in attributes)
+                {
+                    tw.WriteLine($"[{attribute}]");
                 }
             }
 
@@ -114,11 +131,13 @@ namespace SG1.UtilityTypes
 
                     var propertyType = transformations.Select(t => t.GetPropertyType(property)).Where(t => t != null).LastOrDefault() ?? property.Type;
                     var shouldIncludePropertySetter = transformations.Select(t => t.ShouldIncludePropertySetter(property)).Where(t => t.HasValue).LastOrDefault();
+                    var shouldIncludeAttributes = transformations.Select(t => t.ShouldIncludeAttributes(property)).Where(t => t.HasValue).LastOrDefault();
                     PrintProperty(
                         indentWriter,
                         property,
                         propertyType,
-                        shouldIncludePropertySetter ?? property.SetMethod != null
+                        shouldIncludePropertySetter ?? property.SetMethod != null,
+                        shouldIncludeAttributes ?? false
                     );
                 }
             }

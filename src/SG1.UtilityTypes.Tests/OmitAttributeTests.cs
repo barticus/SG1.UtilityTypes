@@ -100,5 +100,39 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
 
             Assert.AreEqual(expectedOutput, output);
         }
+
+
+        [Test]
+        public void Model1OmittedWithAttributesArray()
+        {
+            string source = @"
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+    [SG1.UtilityTypes.Omit(typeof(Model1), new string[] { ""FirstName"" }, IncludeAttributes = true)]
+    public partial class Model1OmittedArray { }
+}";
+
+            string expectedOutput = @"using System;
+
+#nullable enable
+namespace SG1.UtilityTypes.Tests.SampleClasses
+{
+    public partial class Model1OmittedArray
+    {
+        [System.ComponentModel.DataAnnotations.RequiredAttribute]
+        [System.ComponentModel.DataAnnotations.MaxLengthAttribute(321)]
+        public string LastName { get; set; } = default!;
+        public string? Email { get; set; }
+        public int Age { get; set; } = default!;
+    };
+}
+#nullable restore
+";
+            string output = TestUtilities.GetGeneratedOutput(source);
+
+            Assert.NotNull(output);
+
+            Assert.AreEqual(expectedOutput, output);
+        }
     }
 }

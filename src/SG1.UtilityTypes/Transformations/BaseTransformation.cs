@@ -16,5 +16,7 @@ namespace SG1.UtilityTypes.Transformations
         public virtual bool? ShouldIncludeProperty(IPropertySymbol property) => null;
 
         public virtual bool? ShouldIncludePropertySetter(IPropertySymbol property) => null;
+
+        public virtual bool? ShouldIncludeAttributes(IPropertySymbol property) => null;
     }
 }
