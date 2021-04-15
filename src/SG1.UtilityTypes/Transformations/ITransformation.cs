@@ -8,5 +8,6 @@ namespace SG1.UtilityTypes.Transformations
         bool? ShouldIncludeProperty(IPropertySymbol property);
         ITypeSymbol? GetPropertyType(IPropertySymbol property);
         bool? ShouldIncludePropertySetter(IPropertySymbol property);
+        bool? ShouldIncludeAttributes(IPropertySymbol property);
     }
 }

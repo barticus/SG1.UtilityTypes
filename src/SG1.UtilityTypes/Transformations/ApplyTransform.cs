@@ -18,6 +18,7 @@ namespace SG1.UtilityTypes
         public bool IsReadonly { get; set; } = default!;
         public string[] IncludeProperties { get; set; } = default!;
         public string[] ExcludeProperties { get; set; } = default!;
+        public bool IncludeAttributes { get; set; } = default!;
         public ApplyTransformAttribute(Type sourceType)
         {
         }
@@ -32,6 +33,7 @@ namespace SG1.UtilityTypes
             var isReadonly = GetNamedArgument(attributeData, "IsReadonly") as bool?;
             var includeProperties = GetNamedArguments<string>(attributeData, "IncludeProperties");
             var excludeProperties = GetNamedArguments<string>(attributeData, "ExcludeProperties");
+            var includeAttributes = GetNamedArgument(attributeData, "IncludeAttributes") as bool?;
             if (sourceType == null)
                 return null;
 
@@ -39,7 +41,8 @@ namespace SG1.UtilityTypes
             {
                 IsReadonly = isReadonly,
                 IncludeProperties = includeProperties,
-                ExcludeProperties = excludeProperties
+                ExcludeProperties = excludeProperties,
+                IncludeAttributes = includeAttributes,
             };
         }
 
@@ -51,6 +54,7 @@ namespace SG1.UtilityTypes
 
     internal class ApplyTransform : BaseTransformation
     {
+        public bool? IncludeAttributes { get; set; }
         public bool? IsReadonly { get; set; }
         public string[]? IncludeProperties { get; set; }
         public string[]? ExcludeProperties { get; set; }
@@ -58,6 +62,7 @@ namespace SG1.UtilityTypes
         public ApplyTransform(ApplyTransform applyTransform) : base(applyTransform.SourceType)
         {
             IsReadonly = applyTransform.IsReadonly;
+            IncludeAttributes = applyTransform.IncludeAttributes;
             IncludeProperties = applyTransform.IncludeProperties;
             ExcludeProperties = applyTransform.ExcludeProperties;
         }
@@ -80,5 +85,7 @@ namespace SG1.UtilityTypes
 
             return null;
         }
+
+        public override bool? ShouldIncludeAttributes(IPropertySymbol property) => IncludeAttributes;
     }
 }

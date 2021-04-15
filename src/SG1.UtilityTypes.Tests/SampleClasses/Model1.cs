@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace SG1.UtilityTypes.Tests.SampleClasses
 {
     public interface IModel1
@@ -13,11 +15,13 @@ namespace SG1.UtilityTypes.Tests.SampleClasses
         /// <summary>
         /// The first name
         /// </summary>
+        [Required, MaxLength(123)]
         public string FirstName { get; set; } = default!;
 
         /// <summary>
         /// The last name
         /// </summary>
+        [Required, MaxLength(321)]
         public string LastName { get; set; } = default!;
 
         /// <summary>
